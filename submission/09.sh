@@ -49,14 +49,14 @@ echo ""
 
 # STUDENT TASK: Decode the transaction to get the TXID
 # WRITE YOUR SOLUTION BELOW:
-TXID==$(bitcoin-cli -regtest decoderawtransaction "$BASE_TX" | jq -r '.txid')
+TXID==$(bitcoin-cli -regtest decoderawtransaction $BASE_TX | jq -r '.txid')
 check_cmd "Transaction decoding" "TXID" "$TXID"
 
 echo "Transaction ID: $TXID"
 
 # STUDENT TASK: Extract the number of inputs and outputs from the transaction
 # WRITE YOUR SOLUTION BELOW:
-NUM_INPUTS=NUM_INPUTS=$(bitcoin-cli -regtest decoderawtransaction "$BASE_TX" | jq '.vin | length')
+NUM_INPUTS=$(bitcoin-cli -regtest decoderawtransaction "$BASE_TX" | jq '.vin | length')
 check_cmd "Input counting" "NUM_INPUTS" "$NUM_INPUTS"
 
 NUM_OUTPUTS=$(bitcoin-cli -regtest decoderawtransaction "$BASE_TX" | jq '.vout | length')
@@ -88,10 +88,29 @@ echo ""
 # STUDENT TASK: Extract the available UTXOs from the decoded transaction for spending
 # WRITE YOUR SOLUTION BELOW:
 UTXO_TXID=$TXID
-UTXO_VOUT_INDEX=
+
+VOUT0_VALUE=$(bitcoin-cli -regtest decoderawtransaction "$BASE_TX" | jq -r '.vout[0].value * 100000000 | floor')
+VOUT1_VALUE=$(bitcoin-cli -regtest decoderawtransaction "$BASE_TX" | jq -r '.vout[1].value * 100000000 | floor')
+
+# Select the appropriate UTXO
+if [ "$VOUT0_VALUE" -ge 15000000 ]; then
+  UTXO_VOUT_INDEX=0
+  UTXO_VALUE=$VOUT0_VALUE
+elif [ "$VOUT1_VALUE" -ge 15000000 ]; then
+  UTXO_VOUT_INDEX=1
+  UTXO_VALUE=$VOUT1_VALUE
+else
+  # If neither UTXO is sufficient alone, select the larger one
+  if [ "$VOUT0_VALUE" -gt "$VOUT1_VALUE" ]; then
+    UTXO_VOUT_INDEX=0
+    UTXO_VALUE=$VOUT0_VALUE
+  else
+    UTXO_VOUT_INDEX=1
+    UTXO_VALUE=$VOUT1_VALUE
+  fi
+fi
 check_cmd "UTXO vout selection" "UTXO_VOUT_INDEX" "$UTXO_VOUT_INDEX"
 
-UTXO_VALUE=
 check_cmd "UTXO value extraction" "UTXO_VALUE" "$UTXO_VALUE"
 
 echo "Selected UTXO:"
