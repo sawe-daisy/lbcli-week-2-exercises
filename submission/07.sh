@@ -29,7 +29,8 @@ CHANGE_BTC=$(printf "%.8f" "$(echo "$CHANGE_SATOSHIS / 100000000" | bc -l)")
 # Create the raw transaction
 RAW_TX_HEX=$(bitcoin-cli -regtest createrawtransaction \
   "[{\"txid\":\"$UTXO_TXID_1\",\"vout\":$UTXO_VOUT_1}, {\"txid\":\"$UTXO_TXID_2\",\"vout\":$UTXO_VOUT_2}]" \
-  "{\"$RECIPIENT\":$AMOUNT_BTC, \"$CHANGE_ADDRESS\":$CHANGE_BTC}")
+  "{\"$RECIPIENT\":$AMOUNT_BTC}")
+
 
 echo $RAW_TX_HEX
 
