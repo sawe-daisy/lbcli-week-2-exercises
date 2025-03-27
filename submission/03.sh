@@ -1,6 +1,6 @@
 #!/bin/bash
 
-BITCOIN_CLI="bitcoin-cli -regtest -rpcwallet=btrustwallet"
+BITCOIN_CLI="bitcoin-cli -regtest"
 
 if ! bitcoin-cli -regtest listwallets | grep -q "btrustwallet"; then
   bitcoin-cli -regtest createwallet "btrustwallet" >/dev/null
@@ -13,6 +13,9 @@ if [ -z "$ADDRESS" ]; then
 fi
 $BITCOIN_CLI generatetoaddress 50 "$ADDRESS" >/dev/null
 $BITCOIN_CLI generatetoaddress 50 "$ADDRESS" >/dev/null
+$BITCOIN_CLI generatetoaddress 50 "$ADDRESS" >/dev/null
+$BITCOIN_CLI generatetoaddress 50 "$ADDRESS" >/dev/null
+sleep 2
 
 echo "$ADDRESS"
 
