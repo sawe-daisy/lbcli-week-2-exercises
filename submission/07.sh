@@ -1,25 +1,37 @@
 #!/bin/bash
 
-UTXO_TXID="23c19f37d4e92e9a115aab86e4edc1b92a51add4e0ed0034bb166314dde50e16"
+# Set recipient address and amount
+RECIPIENT="2MvLcssW49n9atmksjwg2ZCMsEMsoj3pzUP"
+AMOUNT_SATOSHIS=20000000  # 0.20000000 BTC
+
+# UTXOs extracted from decoded transaction
+UTXO_TXID_1="23c19f37d4e92e9a115aab86e4edc1b92a51add4e0ed0034bb166314dde50e16"
 UTXO_VOUT_1=0
+UTXO_TXID_2="23c19f37d4e92e9a115aab86e4edc1b92a51add4e0ed0034bb166314dde50e16"
 UTXO_VOUT_2=1
 
-RECIPIENT="2MvLcssW49n9atmksjwg2ZCMsEMsoj3pzUP"
-AMOUNT_BTC=$(printf "%.8f" 0.20000000)
-
+# Get a change address from the wallet
 CHANGE_ADDRESS=$(bitcoin-cli -regtest getrawchangeaddress)
 
-FEE_SATOSHIS=10000
-TOTAL_INPUT_SATOSHIS=$((16430198 + 7248910))
+# Define total UTXO amount from decoded transaction
+TOTAL_INPUT_SATOSHIS=$((16430198 + 7248910))  # 23,673,108 satoshis
 
-CHANGE_SATOSHIS=$((TOTAL_INPUT_SATOSHIS - 20000000 - FEE_SATOSHIS))
+# Set transaction fee (10,000 satoshis)
+FEE_SATOSHIS=10000
+
+# Calculate change amount
+CHANGE_SATOSHIS=$((TOTAL_INPUT_SATOSHIS - AMOUNT_SATOSHIS - FEE_SATOSHIS))
+
+# Convert amounts to BTC format
+AMOUNT_BTC=$(printf "%.8f" "$(echo "$AMOUNT_SATOSHIS / 100000000" | bc -l)")
 CHANGE_BTC=$(printf "%.8f" "$(echo "$CHANGE_SATOSHIS / 100000000" | bc -l)")
 
+# Create the raw transaction
 RAW_TX_HEX=$(bitcoin-cli -regtest createrawtransaction \
-  "[{\"txid\":\"$UTXO_TXID\",\"vout\":$UTXO_VOUT_1}, {\"txid\":\"$UTXO_TXID\",\"vout\":$UTXO_VOUT_2}]" \
+  "[{\"txid\":\"$UTXO_TXID_1\",\"vout\":$UTXO_VOUT_1}, {\"txid\":\"$UTXO_TXID_2\",\"vout\":$UTXO_VOUT_2}]" \
   "{\"$RECIPIENT\":$AMOUNT_BTC, \"$CHANGE_ADDRESS\":$CHANGE_BTC}")
 
-echo $RAW_TX_HEX
+echo "Raw Transaction Hex: $RAW_TX_HEX"
 
 
 
