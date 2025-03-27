@@ -31,7 +31,7 @@ RAW_TX_HEX=$(bitcoin-cli -regtest createrawtransaction \
   "[{\"txid\":\"$UTXO_TXID_1\",\"vout\":$UTXO_VOUT_1}, {\"txid\":\"$UTXO_TXID_2\",\"vout\":$UTXO_VOUT_2}]" \
   "{\"$RECIPIENT\":$AMOUNT_BTC, \"$CHANGE_ADDRESS\":$CHANGE_BTC}")
 
-echo "Raw Transaction Hex: $RAW_TX_HEX"
+echo $RAW_TX_HEX
 
 
 
